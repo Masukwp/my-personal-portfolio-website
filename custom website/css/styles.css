@@ -1,0 +1,22 @@
+@keyframes gradient {
+    0% {
+        border-image-source: linear-gradient(45deg, #ff00ff, #00ff00, #0000ff);
+    }
+    50% {
+        border-image-source: linear-gradient(45deg, #0000ff, #ff00ff, #00ff00);
+    }
+    100% {
+        border-image-source: linear-gradient(45deg, #00ff00, #0000ff, #ff00ff);
+    }
+}
+
+.gradient-border {
+    border: 2px solid transparent;
+    border-image-slice: 1;
+    animation: gradient 5s linear infinite;
+}
+/* Selection pseudo-element **/
+::selection {
+    background:limegreen!important; /* White/10 */
+    color: white; /* White/80 */
+}
