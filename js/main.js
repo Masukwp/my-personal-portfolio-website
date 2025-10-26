@@ -88,6 +88,78 @@ if (typeof lucide !== 'undefined') {
     lucide.createIcons();
 }
 
+// Theme handling: detect system preference, persist choice, and toggle
+(function() {
+    const THEME_KEY = 'preferred-theme';
+    const root = document.documentElement;
+    const toggleBtn = document.getElementById('theme-toggle');
+    const iconSun = document.querySelector('.theme-icon-sun');
+    const iconMoon = document.querySelector('.theme-icon-moon');
+
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            root.classList.add('light');
+            // show sun icon (meaning light active)
+            if (iconSun) iconSun.style.display = 'inline-block';
+            if (iconMoon) iconMoon.style.display = 'none';
+        } else {
+            root.classList.remove('light');
+            if (iconSun) iconSun.style.display = 'none';
+            if (iconMoon) iconMoon.style.display = 'inline-block';
+        }
+    }
+
+    function getSystemPreference() {
+        try {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        } catch (e) {
+            return 'dark';
+        }
+    }
+
+    function loadTheme() {
+        const stored = localStorage.getItem(THEME_KEY);
+        if (stored === 'light' || stored === 'dark') return stored;
+        return getSystemPreference();
+    }
+
+    function saveTheme(theme) {
+        try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* ignore */ }
+    }
+
+    // Initialize
+    const initialTheme = loadTheme();
+    applyTheme(initialTheme);
+
+    // Listen for system changes (if user hasn't explicitly chosen)
+    try {
+        const mq = window.matchMedia('(prefers-color-scheme: light)');
+        mq.addEventListener && mq.addEventListener('change', (e) => {
+            const stored = localStorage.getItem(THEME_KEY);
+            if (stored !== 'light' && stored !== 'dark') {
+                applyTheme(e.matches ? 'light' : 'dark');
+            }
+        });
+    } catch (e) {}
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            const current = root.classList.contains('light') ? 'light' : 'dark';
+            const next = current === 'light' ? 'dark' : 'light';
+            applyTheme(next);
+            saveTheme(next);
+        });
+    }
+
+    // Recreate lucide icons after toggling to ensure icons render correctly
+    // (lucide uses data-lucide attributes already in DOM)
+    if (typeof lucide !== 'undefined') {
+        // small delay to ensure icons in header exist
+        setTimeout(() => lucide.createIcons(), 50);
+    }
+
+})();
+
 // Developer portrait
 const developerPortrait = document.createElement('img');
 developerPortrait.src = 'assets/images/f0f33052-7e87-44a7-9c52-a02692aceec9_800w.jpg';
