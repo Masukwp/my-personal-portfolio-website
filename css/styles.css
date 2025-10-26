@@ -21,59 +21,15 @@
     color: white; /* White/80 */
 }
 
-/* Theme variables - default to dark */
-:root {
-    --bg: #000000; /* current dark background (keeps existing look) */
-    --bg-hero: rgba(0,0,0,0.8);
-    --text: #ffffff;
-    --muted: rgba(255,255,255,0.7);
-}
-
-/* Light theme overrides */
-:root.light {
-    --bg: #ffffff; /* light mode background should be white */
-    --bg-hero: rgba(255,255,255,0.95);
-    --text: #0b0b0b;
-    --muted: rgba(0,0,0,0.7);
-}
-
-/* Apply variables */
+/* Simplified: single dark theme (theme toggling removed) */
 body {
-    background-color: var(--bg) !important;
-    color: var(--text) !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
 }
 
 header, .aura-background-component {
-    background-color: var(--bg-hero) !important;
+    background-color: rgba(0,0,0,0.8) !important;
 }
 
-/* Theme toggle icons sizing */
+/* If themed icon helpers remain, hide them by default (safe fallback) */
 .theme-toggle-hidden { display: none !important; }
-
-/* Ensure elements using Tailwind white utilities show dark text in light mode */
-:root.light [class*="text-white"] {
-    color: var(--text) !important;
-}
-
-/* Also cover neutral/text classes and common text elements */
-:root.light [class*="text-neutral"],
-:root.light p,
-:root.light h1,
-:root.light h2,
-:root.light h3,
-:root.light h4,
-:root.light h5,
-:root.light h6,
-:root.light a,
-:root.light span,
-:root.light li,
-:root.light button,
-:root.light nav,
-:root.light header,
-:root.light section,
-:root.light aside {
-    color: var(--text) !important;
-}
-
-/* Make sure svg icons that use currentColor follow the text color */
-:root.light svg { color: var(--text) !important; stroke: var(--text) !important; fill: var(--text) !important; }

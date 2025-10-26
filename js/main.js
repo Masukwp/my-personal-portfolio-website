@@ -1,17 +1,43 @@
-// Mobile menu toggle
+// Mobile menu toggle (robust)
 const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 const mobileMenu = document.getElementById('mobile-menu');
 
-mobileMenuBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('-translate-y-full');
-});
+if (mobileMenuBtn && mobileMenu) {
+    // Ensure button has accessible state
+    mobileMenuBtn.setAttribute('aria-expanded', 'false');
 
-// Close mobile menu when clicking links
-document.querySelectorAll('.mobile-nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-        mobileMenu.classList.add('-translate-y-full');
+    mobileMenuBtn.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.contains('translate-y-0') || !mobileMenu.classList.contains('-translate-y-full');
+        if (isOpen) {
+            // hide
+            mobileMenu.classList.remove('translate-y-0');
+            mobileMenu.classList.add('-translate-y-full');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        } else {
+            // show
+            mobileMenu.classList.remove('-translate-y-full');
+            mobileMenu.classList.add('translate-y-0');
+            mobileMenuBtn.setAttribute('aria-expanded', 'true');
+        }
     });
-});
+
+    // Close mobile menu when clicking links
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('translate-y-0');
+            mobileMenu.classList.add('-translate-y-full');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    // Ensure initial hidden state for small screens
+    if (!mobileMenu.classList.contains('-translate-y-full') && !mobileMenu.classList.contains('translate-y-0')) {
+        mobileMenu.classList.add('-translate-y-full');
+    }
+} else {
+    // Avoid runtime errors if elements are missing
+    console.warn('Mobile menu button or menu element not found.');
+}
 
 // Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -88,77 +114,7 @@ if (typeof lucide !== 'undefined') {
     lucide.createIcons();
 }
 
-// Theme handling: detect system preference, persist choice, and toggle
-(function() {
-    const THEME_KEY = 'preferred-theme';
-    const root = document.documentElement;
-    const toggleBtn = document.getElementById('theme-toggle');
-    const iconSun = document.querySelector('.theme-icon-sun');
-    const iconMoon = document.querySelector('.theme-icon-moon');
-
-    function applyTheme(theme) {
-        if (theme === 'light') {
-            root.classList.add('light');
-            // show sun icon (meaning light active)
-            if (iconSun) iconSun.style.display = 'inline-block';
-            if (iconMoon) iconMoon.style.display = 'none';
-        } else {
-            root.classList.remove('light');
-            if (iconSun) iconSun.style.display = 'none';
-            if (iconMoon) iconMoon.style.display = 'inline-block';
-        }
-    }
-
-    function getSystemPreference() {
-        try {
-            return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-        } catch (e) {
-            return 'dark';
-        }
-    }
-
-    function loadTheme() {
-        const stored = localStorage.getItem(THEME_KEY);
-        if (stored === 'light' || stored === 'dark') return stored;
-        return getSystemPreference();
-    }
-
-    function saveTheme(theme) {
-        try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* ignore */ }
-    }
-
-    // Initialize
-    const initialTheme = loadTheme();
-    applyTheme(initialTheme);
-
-    // Listen for system changes (if user hasn't explicitly chosen)
-    try {
-        const mq = window.matchMedia('(prefers-color-scheme: light)');
-        mq.addEventListener && mq.addEventListener('change', (e) => {
-            const stored = localStorage.getItem(THEME_KEY);
-            if (stored !== 'light' && stored !== 'dark') {
-                applyTheme(e.matches ? 'light' : 'dark');
-            }
-        });
-    } catch (e) {}
-
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const current = root.classList.contains('light') ? 'light' : 'dark';
-            const next = current === 'light' ? 'dark' : 'light';
-            applyTheme(next);
-            saveTheme(next);
-        });
-    }
-
-    // Recreate lucide icons after toggling to ensure icons render correctly
-    // (lucide uses data-lucide attributes already in DOM)
-    if (typeof lucide !== 'undefined') {
-        // small delay to ensure icons in header exist
-        setTimeout(() => lucide.createIcons(), 50);
-    }
-
-})();
+// Theme support removed — site uses a single dark style.
 
 // Developer portrait
 const developerPortrait = document.createElement('img');
